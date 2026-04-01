@@ -40,7 +40,7 @@ def generate_synthetic_locations(n_customers=50):
     
     # Save to CSV
     df_final.to_csv('medellin_customers.csv', index=False)
-    print(f"✅ Dataset created: 1 Depot at Alpujarra and {n_customers} customers.")
+    print(f"✅ Dataset initialized: 1 central depot and {n_customers} nodes generated.")
 
 if __name__ == "__main__":
     generate_synthetic_locations()
