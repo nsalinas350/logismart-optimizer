@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 
@@ -39,8 +40,21 @@ def generate_synthetic_locations(n_customers=50):
     df_final = pd.concat([df_depot, df_customers], ignore_index=True)
     
     # Save to CSV
-    df_final.to_csv('medellin_customers.csv', index=False)
+    # Defining folder rute, going up a level from optimization-engine
+    data_folder = os.path.join(os.getcwd(), 'data')
+
+    # Check if the folder exist; if not, create it
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
+        print(f"📁 Folder created: {data_folder}")
+
+    # Define the full file path
+    file_path = os.path.join(data_folder, 'medellin_customers.csv')
+
+    # Save the file
+    df_final.to_csv(file_path, index=False)
     print(f"✅ Dataset initialized: 1 central depot and {n_customers} nodes generated.")
+    print(f"✅ File saved successfully in: {file_path}")
 
 if __name__ == "__main__":
     generate_synthetic_locations()
