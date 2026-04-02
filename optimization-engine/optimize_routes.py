@@ -3,8 +3,9 @@ import numpy as np
 from pulp import *
 from visualize_route import generate_route_map
 
-def solve_logistics_route():
+def solve_logistics_route(csv_path='medellin_customers.csv', gap_rel=0.15):
     # 1. Load Data
+    df = pd.read_csv(csv_path)
     dist_matrix = np.load('distance_matrix.npy')
     n = len(df) # Should be 51
     
@@ -56,32 +57,28 @@ def solve_logistics_route():
         print("       LOGISMART: OPTIMIZED ROUTE PLAN (MEDELLIN)      ")
         print("="*50)
 
+        route_sequence = []
         curr_node = 0
         visited_nodes = 0
-        total_locations = n
         route_is_complete = True
-        route_list = []
 
         # We use a while loop to follow the 'breadcrumb trail' of the route
-        while visited_nodes < total_locations:
+        while visited_nodes < n:
             found_next = False
+            route_sequence.append(curr_node) # Saving the current node
             
-            for next_node in range(total_locations):
+            for next_node in range(n):
                 # 1. Get the value of the decision variable x[i][j]
                 # Using value() to extract the float from the PuLP object
                 val = value(x[curr_node][next_node])
                 
                 # 2. Null-check: If solver timed out, some variables might be None
                 if val is not None and val > 0.9:
-                    # 3. Identify the visit order (u) for the destination
-                    # The Depot (0) doesn't have a 'u' variable in our optimized range
-                    step_order = value(u[next_node]) if next_node in u else 0
-                                   
+                    # 3. Identify the visit order (u) for the destination       
                     location_label = df.iloc[next_node]['location_name']
                     print(f"Step {visited_nodes + 1:2}: From {curr_node:2} ---> To {next_node:2} | {location_label}")
 
                     # 4. Move to the next node and mark as found
-                    route_list.append(next_node)
                     curr_node = next_node
                     visited_nodes += 1
                     found_next = True
@@ -97,19 +94,18 @@ def solve_logistics_route():
         print("="*50)
         if route_is_complete:
             print("✅ Success: Full Hamiltonian Path identified.")
-            
-            final_sequence = [0] + route_list
-            return final_sequence
         else:
             print("⚠️ Warning: Partial route generated. Increase timeLimit or gapRel.")
         print("="*50 + "\n")
-
+        return route_sequence, value(prob.objective)
+        
     else:
         print(f"\n[!] Critical: Solver failed with status {LpStatus[prob.status]}.")
+        return None, None
 
 
 
 if __name__ == "__main__":
     df = pd.read_csv('medellin_customers.csv')
-    sequence = solve_logistics_route()
+    sequence, distance = solve_logistics_route()
     generate_route_map(df, sequence)
