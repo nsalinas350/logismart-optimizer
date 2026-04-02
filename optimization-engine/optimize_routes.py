@@ -3,7 +3,7 @@ import numpy as np
 from pulp import *
 from visualize_route import generate_route_map
 
-def solve_logistics_route(csv_path='medellin_customers.csv', gap_rel=0.15):
+def solve_logistics_route(csv_path='medellin_customers.csv', timeLimit=600, gap_rel=0.15):
     # 1. Load Data
     df = pd.read_csv(csv_path)
     dist_matrix = np.load('distance_matrix.npy')
@@ -42,7 +42,7 @@ def solve_logistics_route(csv_path='medellin_customers.csv', gap_rel=0.15):
     # 6. Solve the problem
     print("\nSolving the optimal route for Medellin... 🚚")
     # Stop when te solution is within 5% of the theoretical optimum or after 600 seconds
-    prob.solve(PULP_CBC_CMD(timeLimit=600, gapRel=0.15))
+    prob.solve(PULP_CBC_CMD(timeLimit=timeLimit, gapRel=gap_rel))
 
     # --- 7. TECHNICAL STATUS ---
     print("-" * 45)
