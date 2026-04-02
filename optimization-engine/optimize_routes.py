@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pulp import *
+from visualize_route import generate_route_map
 
 def solve_logistics_route():
     # 1. Load Data
@@ -60,6 +61,7 @@ def solve_logistics_route():
         visited_nodes = 0
         total_locations = n
         route_is_complete = True
+        route_list = []
 
         # We use a while loop to follow the 'breadcrumb trail' of the route
         while visited_nodes < total_locations:
@@ -75,14 +77,12 @@ def solve_logistics_route():
                     # 3. Identify the visit order (u) for the destination
                     # The Depot (0) doesn't have a 'u' variable in our optimized range
                     step_order = value(u[next_node]) if next_node in u else 0
-                    
-                    # label = "DEPOT" if next_node == 0 else f"Node {next_node:2}"
-                    # print(f"Step {visited_nodes + 1:2}: From {curr_node:2} ---> To {next_node:2} | {label} | Order: {step_order:.0f}")
-                    
+                                   
                     location_label = df.iloc[next_node]['location_name']
                     print(f"Step {visited_nodes + 1:2}: From {curr_node:2} ---> To {next_node:2} | {location_label}")
 
                     # 4. Move to the next node and mark as found
+                    route_list.append(next_node)
                     curr_node = next_node
                     visited_nodes += 1
                     found_next = True
@@ -98,6 +98,8 @@ def solve_logistics_route():
         print("="*50)
         if route_is_complete:
             print("✅ Success: Full Hamiltonian Path identified.")
+            final_sequence = [0] + route_list
+            generate_route_map(df, final_sequence)
         else:
             print("⚠️ Warning: Partial route generated. Increase timeLimit or gapRel.")
         print("="*50 + "\n")
