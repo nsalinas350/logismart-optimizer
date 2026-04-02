@@ -5,7 +5,6 @@ from visualize_route import generate_route_map
 
 def solve_logistics_route():
     # 1. Load Data
-    df = pd.read_csv('medellin_customers.csv')
     dist_matrix = np.load('distance_matrix.npy')
     n = len(df) # Should be 51
     
@@ -98,8 +97,9 @@ def solve_logistics_route():
         print("="*50)
         if route_is_complete:
             print("✅ Success: Full Hamiltonian Path identified.")
+            
             final_sequence = [0] + route_list
-            generate_route_map(df, final_sequence)
+            return final_sequence
         else:
             print("⚠️ Warning: Partial route generated. Increase timeLimit or gapRel.")
         print("="*50 + "\n")
@@ -110,4 +110,6 @@ def solve_logistics_route():
 
 
 if __name__ == "__main__":
-    solve_logistics_route()
+    df = pd.read_csv('medellin_customers.csv')
+    sequence = solve_logistics_route()
+    generate_route_map(df, sequence)
