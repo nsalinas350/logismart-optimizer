@@ -68,8 +68,8 @@ def run_tsp(precision: float = 0.15, seconds: int = 600):
                 "path": sequence
             }
         
-            # If you only want the map
-            return RedirectResponse(url=f"/maps/{output_map_name}")
+            # # If you only want the map
+            # return RedirectResponse(url=f"/maps/{output_map_name}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
